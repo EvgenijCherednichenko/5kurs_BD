@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "hh-db"
+version = "0.1.0"
+description = ""
+authors = ["Евгений Чередниченко <a.potashov@region1.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+psycopg2-binary = "^2.9.9"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
