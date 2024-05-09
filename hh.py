@@ -40,8 +40,8 @@ def serialized_vacancy(vacancy: dict) -> dict:
     return {
         "name": vacancy.get("name"),
         "url": vacancy.get("url"),
-        "salary_from": vacancy.get("salary").get("from"),
-        "salary_to": vacancy.get("salary").get("to"),
+        "salary_from": vacancy.get("salary").get("from") if vacancy.get("salary") else None,
+        "salary_to": vacancy.get("salary").get("to") if vacancy.get("salary") else None,
         "description": vacancy.get("description"),
         "requirements": vacancy.get("requirements"),
         "employer": vacancy.get("employer")

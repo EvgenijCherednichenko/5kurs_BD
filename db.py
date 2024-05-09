@@ -32,7 +32,7 @@ class DBManager:
 
         query = """
             create table vacancy 
-            (id serial, name varchar(128), url varchar(256), 
+            (id serial primary key, name varchar(128), url varchar(256), 
             description text, requirements text, salary_from int, salary_to int, employer_id int,
             CONSTRAINT fk_employer FOREIGN KEY (employer_id) REFERENCES employer(id)
             )
@@ -47,10 +47,10 @@ class DBManager:
         :return: Результат операции удаления таблиц.
         """
         cursor = self.connection.cursor()
-        company_drop_query = """drop table employer cascade"""
+        company_drop_query = """drop table if exists employer cascade"""
         cursor.execute(company_drop_query)
         self.connection.commit()
-        vacancy_drop_query = """drop table vacancy"""
+        vacancy_drop_query = """drop table if exists vacancy"""
         cursor.execute(vacancy_drop_query)
         self.connection.commit()
         return True
@@ -94,17 +94,27 @@ class DBManager:
         except Exception as e:
             raise e
 
-    def vacancies_and_companies_count(self) -> int:
+    def get_company_vacancy_counts(self) -> dict:
         """
-        Возвращает общее количество вакансий и компаний в базе данных.
+        Возвращает наименование компании и количество вакансий для каждой компании.
 
-        :return: Общее количество вакансий и компаний.
+        :return: Словарь, где ключи - наименования компаний, значения - количество вакансий.
         """
         cursor = self.connection.cursor()
-        query_total_count = """SELECT (SELECT COUNT(*) FROM vacancy) + (SELECT COUNT(*) FROM employer)"""
-        cursor.execute(query_total_count)
-        total_count_vacancies_and_companies = cursor.fetchone()[0]
-        return total_count_vacancies_and_companies
+
+        query_company_vacancy_count = """
+        SELECT e.name, COUNT(v.*) AS vacancy_count
+        FROM employer e
+        LEFT JOIN vacancy v ON v.employer_id = e.id
+        GROUP BY e.name
+        """
+
+        cursor.execute(query_company_vacancy_count)
+        company_vacancy_counts = cursor.fetchall()
+
+        result = {row[0]: row[1] for row in company_vacancy_counts}
+
+        return result
 
     def get_all_vacancies(self) -> list:
         """
